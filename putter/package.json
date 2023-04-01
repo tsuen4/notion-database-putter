@@ -1,0 +1,23 @@
+{
+  "name": "notion-database-putter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "tsuen4 <etshinnaga@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.114",
+    "@types/node": "^18.15.11",
+    "typescript": "^5.0.2"
+  },
+  "scripts": {
+    "lint": "eslint '*.ts' --quiet --fix",
+    "compile": "tsc"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.3",
+    "date-fns": "^2.29.3",
+    "date-fns-tz": "^2.0.0",
+    "esbuild": "^0.17.14",
+    "zod": "^3.21.4"
+  }
+}
