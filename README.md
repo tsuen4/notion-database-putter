@@ -22,9 +22,20 @@ sam deploy --guided
 sam deploy
 ```
 
+## デプロイ後の使用方法
+
+デプロイ後の Outputs に記載されている URL へ、以下の内容を POST する。
+
+```json
+{
+    "database_id": "<your notion database_id>",
+    "content": "<text>"
+}
+```
+
 ## 開発
 
-[sam sync](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-sync.html) を使用することで、AWS 上にデプロイしながらテストできる。Lambda から Lambda を呼び出す処理を書いている都合で [sam local start-api](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-start-api.html) による動作確認ができない。
+[sam sync](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-sync.html) を使用することで、AWS 上にデプロイしながら動作確認ができる。
 
 ```sh
 sam sync --stack-name {{stack-name}} --watch --parameter-overrides NotionApiToken={{your-token}}
