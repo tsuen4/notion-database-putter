@@ -15,20 +15,10 @@ sam deploy --guided
 sam deploy
 ```
 
-## ローカル開発
+## 開発
 
-以下のようにトークンをセットした `env.json` を作成する。
-
-```json
-{
-    "NotionDatabasePutterFunction": {
-        "NOTION_API_TOKEN": "<token value>"
-    }
-}
-```
-
-作成した `env.json` を読み込む形で `sam local start-api` を実行することでローカル開発サーバーが起動する。
+[sam sync](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-sync.html) を使用することで、AWS 上にデプロイしながらテストできる。Lambda から Lambda を呼び出す処理を書いている都合で [sam local start-api](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-start-api.html) による動作確認ができない。
 
 ```sh
-sam local start-api --env-vars env.json
+sam sync --stack-name {{stack-name}} --watch --parameter-overrides NotionApiToken={{your-token}}
 ```
