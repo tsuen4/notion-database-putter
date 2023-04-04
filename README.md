@@ -5,10 +5,17 @@ Notion のデータベースにテキストを投げる AWS Lambda 関数。
 
 ## デプロイ
 
+デプロイ前にビルドする。
+
 ```sh
 sam build
+```
 
+以下のコマンドでデプロイできる。
+
+```sh
 # 初回(=samconfig.tomlが無い場合)のみ --guided オプションを使用して生成させる
+# NotionApiToken の設定が必要
 sam deploy --guided
 
 # 初回以外は以下でデプロイ
@@ -21,4 +28,12 @@ sam deploy
 
 ```sh
 sam sync --stack-name {{stack-name}} --watch --parameter-overrides NotionApiToken={{your-token}}
+```
+
+## CloudFormation スタックの削除
+
+スタックの削除は以下で行う。
+
+```sh
+sam delete --stack-name {{stack-name}}
 ```
