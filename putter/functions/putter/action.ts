@@ -2,6 +2,7 @@ import { Client, isFullPage } from '@notionhq/client';
 import {
     AppendBlockChildrenResponse,
     BlockObjectRequest,
+    CreatePageResponse,
     PageObjectResponse,
 } from '@notionhq/client/build/src/api-endpoints';
 
@@ -58,7 +59,7 @@ export class Action {
         );
     }
 
-    async #createPageWithText(title: string, text: string): Promise<PageObjectResponse> {
+    async #createPageWithText(title: string, text: string): Promise<CreatePageResponse> {
         return this.client.pages
             .create({
                 parent: {
@@ -75,7 +76,7 @@ export class Action {
                 },
                 children: [this.#generateChildren(text)],
             })
-            .then((response) => response as PageObjectResponse);
+            .then((response) => response);
     }
 
     async #appendText(blockId: string, text: string): Promise<AppendBlockChildrenResponse> {
@@ -84,15 +85,15 @@ export class Action {
                 block_id: blockId,
                 children: [this.#generateChildren(text)],
             })
-            .then((response) => response as AppendBlockChildrenResponse);
+            .then((response) => response);
     }
 
-    async put(title: string, text: string): Promise<void> {
+    async put(title: string, text: string): Promise<CreatePageResponse | AppendBlockChildrenResponse> {
         const page = await this.#getPageByTitle(title);
         if (page !== null) {
-            await this.#appendText(page.id, text);
+            return await this.#appendText(page.id, text);
         } else {
-            await this.#createPageWithText(title, text);
+            return await this.#createPageWithText(title, text);
         }
     }
 }
