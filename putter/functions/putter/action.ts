@@ -29,7 +29,7 @@ export class Action {
         };
     }
 
-    async #getPageByTitle(title: string): Promise<PageObjectResponse | undefined> {
+    async #getPageByTitle(title: string): Promise<PageObjectResponse | null> {
         const response = await this.client.databases.query({
             database_id: this.databaseId,
             filter: {
@@ -39,20 +39,23 @@ export class Action {
                 },
             },
         });
-        return response.results
-            .filter((result): result is PageObjectResponse => {
-                if (!isFullPage(result)) {
-                    return false;
-                }
-                const parent = result.parent;
-                if (parent.type !== 'database_id') {
-                    return false;
-                }
-                return (
-                    parent.database_id === this.databaseId || parent.database_id.split('-').join('') === this.databaseId
-                );
-            })
-            .at(0);
+        return (
+            response.results
+                .filter((result): result is PageObjectResponse => {
+                    if (!isFullPage(result)) {
+                        return false;
+                    }
+                    const parent = result.parent;
+                    if (parent.type !== 'database_id') {
+                        return false;
+                    }
+                    return (
+                        parent.database_id === this.databaseId ||
+                        parent.database_id.split('-').join('') === this.databaseId
+                    );
+                })
+                .at(0) || null
+        );
     }
 
     async #createPageWithText(title: string, text: string): Promise<PageObjectResponse> {
@@ -85,9 +88,9 @@ export class Action {
     }
 
     async put(title: string, text: string): Promise<void> {
-        const existPage = await this.#getPageByTitle(title);
-        if (existPage !== null) {
-            await this.#appendText(existPage.id, text);
+        const page = await this.#getPageByTitle(title);
+        if (page !== null) {
+            await this.#appendText(page.id, text);
         } else {
             await this.#createPageWithText(title, text);
         }
