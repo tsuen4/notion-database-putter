@@ -1,4 +1,4 @@
-import { Client } from '@notionhq/client';
+import { Client, isFullPage } from '@notionhq/client';
 import {
     AppendBlockChildrenResponse,
     BlockObjectRequest,
@@ -41,7 +41,10 @@ export class Action {
         });
         return response.results
             .filter((result): result is PageObjectResponse => {
-                const parent = (result as PageObjectResponse).parent;
+                if (!isFullPage(result)) {
+                    return false
+                }
+                const parent = result.parent;
                 if (parent.type !== 'database_id') {
                     return false;
                 }
