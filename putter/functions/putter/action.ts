@@ -42,13 +42,15 @@ export class Action {
         return response.results
             .filter((result): result is PageObjectResponse => {
                 if (!isFullPage(result)) {
-                    return false
+                    return false;
                 }
                 const parent = result.parent;
                 if (parent.type !== 'database_id') {
                     return false;
                 }
-                return parent.database_id.split('-').join('') === this.databaseId;
+                return (
+                    parent.database_id === this.databaseId || parent.database_id.split('-').join('') === this.databaseId
+                );
             })
             .at(0);
     }
@@ -84,7 +86,7 @@ export class Action {
 
     async put(title: string, text: string): Promise<void> {
         const existPage = await this.#getPageByTitle(title);
-        if (existPage !== undefined) {
+        if (existPage !== null) {
             await this.#appendText(existPage.id, text);
         } else {
             await this.#createPageWithText(title, text);
