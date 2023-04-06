@@ -15,37 +15,41 @@ export class Action {
         });
     }
 
-    #generateChildren(text: string): BlockObjectRequest {
-        const request: BlockObjectRequest = {
-            paragraph: {
-                rich_text: [],
-            },
-        };
-
-        const urlSplitter = /https?:\/\/\S+/g;
-        const urls = text.match(urlSplitter);
-        const nonUrls = text.split(urlSplitter);
-        const textArray = nonUrls.reduce((acc, cur, i) => acc.concat(cur, (urls && urls[i]) || ''), [] as string[]);
-        textArray.map((text) => {
-            if (urlSplitter.test(text)) {
-                request.paragraph.rich_text.push({
-                    type: 'text',
-                    text: {
-                        content: text,
-                        link: { url: text },
-                    },
-                });
-            } else {
-                request.paragraph.rich_text.push({
-                    type: 'text',
-                    text: {
-                        content: text,
-                    },
-                });
-            }
+    #generateBlocks(input: string): BlockObjectRequest[] {
+        const lines = input.split(/\n/);
+        return lines.map<BlockObjectRequest>((line) => {
+            const request: BlockObjectRequest = {
+                type: 'paragraph',
+                paragraph: {
+                    rich_text: [],
+                },
+            };
+            const urlSplitter = /https?:\/\/\S+/g;
+            const urls = line.match(urlSplitter);
+            const nonUrls = line.split(urlSplitter);
+            const splittedTextByUrl = nonUrls
+                .reduce((prev, current, i) => prev.concat(current, (urls && urls[i]) || ''), [] as string[])
+                .filter(Boolean);
+            splittedTextByUrl.map((part) => {
+                if (urlSplitter.test(part)) {
+                    request.paragraph.rich_text.push({
+                        type: 'text',
+                        text: {
+                            content: part,
+                            link: { url: part },
+                        },
+                    });
+                } else {
+                    request.paragraph.rich_text.push({
+                        type: 'text',
+                        text: {
+                            content: part,
+                        },
+                    });
+                }
+            });
+            return request;
         });
-
-        return request;
     }
 
     async #getPageByTitle(title: string): Promise<PageObjectResponse | null> {
@@ -77,7 +81,7 @@ export class Action {
         );
     }
 
-    async #createPageWithText(title: string, text: string): Promise<CreatePageResponse> {
+    async #createPageWithText(title: string, input: string): Promise<CreatePageResponse> {
         return this.client.pages
             .create({
                 parent: {
@@ -92,26 +96,26 @@ export class Action {
                         },
                     ],
                 },
-                children: [this.#generateChildren(text)],
+                children: this.#generateBlocks(input),
             })
             .then((response) => response);
     }
 
-    async #appendText(blockId: string, text: string): Promise<AppendBlockChildrenResponse> {
+    async #appendText(blockId: string, input: string): Promise<AppendBlockChildrenResponse> {
         return this.client.blocks.children
             .append({
                 block_id: blockId,
-                children: [this.#generateChildren(text)],
+                children: this.#generateBlocks(input),
             })
             .then((response) => response);
     }
 
-    async put(title: string, text: string): Promise<CreatePageResponse | AppendBlockChildrenResponse> {
+    async put(title: string, input: string): Promise<CreatePageResponse | AppendBlockChildrenResponse> {
         const page = await this.#getPageByTitle(title);
         if (page !== null) {
-            return await this.#appendText(page.id, text);
+            return await this.#appendText(page.id, input);
         } else {
-            return await this.#createPageWithText(title, text);
+            return await this.#createPageWithText(title, input);
         }
     }
 }
