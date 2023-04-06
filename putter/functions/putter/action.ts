@@ -16,18 +16,36 @@ export class Action {
     }
 
     #generateChildren(text: string): BlockObjectRequest {
-        return {
+        const request: BlockObjectRequest = {
             paragraph: {
-                rich_text: [
-                    {
-                        type: 'text',
-                        text: {
-                            content: text,
-                        },
-                    },
-                ],
+                rich_text: [],
             },
         };
+
+        const urlSplitter = /https?:\/\/\S+/g;
+        const urls = text.match(urlSplitter);
+        const nonUrls = text.split(urlSplitter);
+        const textArray = nonUrls.reduce((acc, cur, i) => acc.concat(cur, (urls && urls[i]) || ''), [] as string[]);
+        textArray.map((text) => {
+            if (urlSplitter.test(text)) {
+                request.paragraph.rich_text.push({
+                    type: 'text',
+                    text: {
+                        content: text,
+                        link: { url: text },
+                    },
+                });
+            } else {
+                request.paragraph.rich_text.push({
+                    type: 'text',
+                    text: {
+                        content: text,
+                    },
+                });
+            }
+        });
+
+        return request;
     }
 
     async #getPageByTitle(title: string): Promise<PageObjectResponse | null> {
