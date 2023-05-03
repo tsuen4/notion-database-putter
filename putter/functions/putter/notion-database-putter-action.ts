@@ -6,7 +6,7 @@ import {
     PageObjectResponse,
 } from '@notionhq/client/build/src/api-endpoints';
 
-export class Action {
+export class NotionDatabasePutterAction {
     private client: Client;
 
     constructor(token: string, private readonly databaseId: string) {
@@ -110,7 +110,7 @@ export class Action {
             .then((response) => response);
     }
 
-    async put(title: string, input: string): Promise<CreatePageResponse | AppendBlockChildrenResponse> {
+    async invoke(title: string, input: string): Promise<CreatePageResponse | AppendBlockChildrenResponse> {
         const page = await this.#getPageByTitle(title);
         if (page !== null) {
             return await this.#appendText(page.id, input);

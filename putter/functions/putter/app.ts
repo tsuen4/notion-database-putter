@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { formatInTimeZone } from 'date-fns-tz';
-import { Action } from './action';
+import { NotionDatabasePutterAction } from './notion-database-putter-action';
 import { RequestBody, RequestBodyType } from '../entity';
 import { handleResponse } from '../response';
 
@@ -21,9 +21,9 @@ export async function lambdaHandler(event: APIGatewayProxyEvent, context: Contex
         return handleResponse(422, 'Unprocessable Entity');
     }
 
-    const action = new Action(token, body.database_id);
+    const action = new NotionDatabasePutterAction(token, body.database_id);
     try {
-        await action.put(today, body.content);
+        await action.invoke(today, body.content);
     } catch (err) {
         console.error(err);
         return handleResponse(500, 'some error happened');
