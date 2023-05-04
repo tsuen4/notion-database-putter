@@ -9,13 +9,13 @@ describe('Generate block', () => {
         expect(result).toHaveLength(1);
 
         if (result[0].type !== 'paragraph') {
-            throw new Error('result[0] is not "paragraph"');
+            throw new Error('result[0].type is not "paragraph"');
         }
         const richText = result[0].paragraph.rich_text;
         expect(richText).toHaveLength(1);
 
         if (richText[0].type !== 'text') {
-            throw new Error('richText[0] is not "text"');
+            throw new Error('richText[0].type is not "text"');
         }
         const text = richText[0].text;
         expect(text.content).toEqual(input);
@@ -64,14 +64,14 @@ describe('Generate block', () => {
         expect(result).toHaveLength(1);
 
         if (result[0].type !== 'paragraph') {
-            throw new Error('result[0] is not "paragraph"');
+            throw new Error('result[0].type is not "paragraph"');
         }
         const richText = result[0].paragraph.rich_text;
         expect(richText).toHaveLength(3); // ['hoge ', 'https://example.com', ' fuga']
 
         // 'hoge '
         if (richText[0].type !== 'text') {
-            throw new Error('richText[0] is not "text"');
+            throw new Error('richText[0].type is not "text"');
         }
         const text0 = richText[0].text;
         expect(text0.content).toEqual('hoge ');
