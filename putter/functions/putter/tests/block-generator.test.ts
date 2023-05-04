@@ -57,7 +57,7 @@ describe('Generate block', () => {
         expect(text1).not.toHaveProperty('link');
     });
 
-    test('generate include the URL block', async () => {
+    test('generate block include the URL', async () => {
         const input = 'hoge https://example.com fuga';
         const gen = new BlockGenerator().enableIncludeUrl();
         const result = gen.invoke(input);
