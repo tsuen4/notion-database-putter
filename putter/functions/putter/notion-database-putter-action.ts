@@ -1,54 +1,17 @@
 import { Client, isFullPage } from '@notionhq/client';
 import {
     AppendBlockChildrenResponse,
-    BlockObjectRequest,
     CreatePageResponse,
     PageObjectResponse,
 } from '@notionhq/client/build/src/api-endpoints';
+import { BlockGenerator } from './block-generator';
 
 export class NotionDatabasePutterAction {
     private client: Client;
 
-    constructor(token: string, private readonly databaseId: string) {
+    constructor(token: string, private readonly databaseId: string, private readonly blockGenerator: BlockGenerator) {
         this.client = new Client({
             auth: token,
-        });
-    }
-
-    #generateBlocks(input: string): BlockObjectRequest[] {
-        const lines = input.split(/\n/);
-        return lines.map<BlockObjectRequest>((line) => {
-            const request: BlockObjectRequest = {
-                type: 'paragraph',
-                paragraph: {
-                    rich_text: [],
-                },
-            };
-            const urlSplitter = /https?:\/\/\S+/g;
-            const urls = line.match(urlSplitter);
-            const nonUrls = line.split(urlSplitter);
-            const splittedTextByUrl = nonUrls
-                .reduce((prev, current, i) => prev.concat(current, (urls && urls[i]) || ''), [] as string[])
-                .filter(Boolean);
-            splittedTextByUrl.map((part) => {
-                if (urlSplitter.test(part)) {
-                    request.paragraph.rich_text.push({
-                        type: 'text',
-                        text: {
-                            content: part,
-                            link: { url: part },
-                        },
-                    });
-                } else {
-                    request.paragraph.rich_text.push({
-                        type: 'text',
-                        text: {
-                            content: part,
-                        },
-                    });
-                }
-            });
-            return request;
         });
     }
 
@@ -96,7 +59,7 @@ export class NotionDatabasePutterAction {
                         },
                     ],
                 },
-                children: this.#generateBlocks(input),
+                children: this.blockGenerator.invoke(input),
             })
             .then((response) => response);
     }
@@ -105,7 +68,7 @@ export class NotionDatabasePutterAction {
         return this.client.blocks.children
             .append({
                 block_id: blockId,
-                children: this.#generateBlocks(input),
+                children: this.blockGenerator.invoke(input),
             })
             .then((response) => response);
     }
