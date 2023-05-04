@@ -59,7 +59,7 @@ export class BlockGenerator {
     }
 
     invoke(input: string): BlockObjectRequest[] {
-        const lines = this.#modes.splitLine ? input.split(/\n/) : [input];
+        const lines = this.#modes.splitLine ? input.split(/\r\n|\r|\n/) : [input];
 
         return lines.map<BlockObjectRequest>((line) => {
             return {

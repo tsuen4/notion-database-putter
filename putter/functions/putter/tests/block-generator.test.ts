@@ -22,8 +22,8 @@ describe('Generate block', () => {
         expect(text).not.toHaveProperty('link');
     });
 
-    test('generate multiple blocks', async () => {
-        const input = 'hoge\nfuga';
+    test.each([{ code: '\r' }, { code: '\n' }, { code: '\r\n' }])('generate multiple blocks (%#)', async ({ code }) => {
+        const input = `hoge${code}fuga`;
         const gen = new BlockGenerator().enableSplitLine();
         const result = gen.invoke(input);
         expect(result).toHaveLength(2);
