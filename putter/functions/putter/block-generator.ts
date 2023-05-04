@@ -61,13 +61,12 @@ export class BlockGenerator {
     invoke(input: string): BlockObjectRequest[] {
         const lines = this.#modes.splitLine ? input.split(/\r\n|\r|\n/) : [input];
 
-        return lines.map<BlockObjectRequest>((line) => {
-            return {
+        return lines.map<BlockObjectRequest>((line) => ({
                 type: 'paragraph',
                 paragraph: {
                     rich_text: this.#generateRichTexts(line),
                 },
-            };
-        });
+            })
+        )
     }
 }
