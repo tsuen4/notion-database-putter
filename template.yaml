@@ -20,9 +20,9 @@ Resources:
     Properties:
       CodeUri: putter/
       Handler: app.lambdaHandler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Architectures:
-        - x86_64
+        - arm64
       Events:
         Putter:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -54,9 +54,9 @@ Resources:
     Properties:
       CodeUri: putter/
       Handler: app.lambdaHandler
-      Runtime: nodejs18.x
+      Runtime: nodejs22.x
       Architectures:
-        - x86_64
+        - arm64
       Environment:
         Variables:
           NOTION_API_TOKEN: !Ref NotionApiToken
